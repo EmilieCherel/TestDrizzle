@@ -21,7 +21,9 @@ export const userRelations = relations(user, ({ one, many }) => ({
 export const posts = pgTable('posts', {
   id: serial('id').primaryKey(),
   text: varchar('text', { length: 256 }),
-  authorId: integer('author_id'),
+  authorId: integer('author_id')
+    .notNull()
+    .references(() => user.id),
 });
 
 export const postRelations = relations(posts, ({ one }) => ({

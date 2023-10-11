@@ -26,6 +26,11 @@ export class UsersController {
     return this.usersServices.findByProfile(id);
   }
 
+  @Get('/posts/:id')
+  async findPostsById(@Param('id') id: number) {
+    return this.usersServices.findPostsById(id);
+  }
+
   @Post()
   async createUser(@Body() dto: UsersDto) {
     return await this.usersServices.create(dto);

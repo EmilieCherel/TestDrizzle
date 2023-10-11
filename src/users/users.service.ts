@@ -86,4 +86,22 @@ export class UsersService {
       console.log(error);
     }
   }
+
+  async findPostsById(id: number) {
+    try {
+      const user = await this.conn.query.user.findFirst({
+        with: {
+          posts: true,
+        },
+        where: eq(schema.user.id, id),
+      });
+      if (!user) {
+        throw new ConflictException('This user does not exist');
+      } else {
+        return user.posts;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
