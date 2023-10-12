@@ -1,10 +1,9 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import * as schema from '../drizzle/schema';
+import * as schema from '../drizzle/schema/index';
 import { CreateClientDto } from './dto/createClient.dto';
 import { eq } from 'drizzle-orm';
 import { PG_CONNECTION } from 'src/constants';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { ScenarioDto } from './dto/scenario.dto';
 
 @Injectable()
 export class ClientsService {
@@ -97,41 +96,6 @@ export class ClientsService {
         throw new ConflictException('This user does not exist');
       } else {
         return client;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async createScenario(dto: ScenarioDto) {
-    console.log(dto);
-    const newScenario = await this.conn
-      .insert(schema.scenario)
-      .values({
-        ...dto,
-      })
-      .returning();
-
-    const { ...result } = newScenario[0];
-    return result;
-  }
-
-  async findAllScenarios() {
-    return await this.conn.query.scenario.findMany();
-  }
-
-  async findScenarioById(id: number) {
-    try {
-      const scenario = await this.conn.query.scenario.findFirst({
-        with: {
-          clients: true,
-        },
-        where: eq(schema.scenario.id, id),
-      });
-      if (!scenario) {
-        throw new ConflictException('This scenario does not exist');
-      } else {
-        return scenario;
       }
     } catch (error) {
       console.log(error);
