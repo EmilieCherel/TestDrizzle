@@ -1,42 +1,45 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
-  id: integer('id').primaryKey(),
+export const clients = pgTable('clients', {
+  id: serial('id').primaryKey(),
   name: text('name'),
-  email: text('email'),
-  age: integer('age'),
-  password: text('password'),
-  address: text('address'),
+  crm: text('crm'),
 });
 
-export const userRelations = relations(user, ({ one, many }) => ({
-  profile: one(profiles, {
-    fields: [user.id],
-    references: [profiles.userId],
-  }),
-  posts: many(posts),
+export const clientRelations = relations(clients, ({ many }) => ({
+  subscriptions: many(clientScenario),
 }));
 
-export const posts = pgTable('posts', {
+export const scenario = pgTable('scenario', {
   id: serial('id').primaryKey(),
-  text: varchar('text', { length: 256 }),
-  authorId: integer('author_id')
-    .notNull()
-    .references(() => user.id),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
 });
 
-export const postRelations = relations(posts, ({ one }) => ({
-  user: one(user, {
-    fields: [posts.authorId],
-    references: [user.id],
-  }),
+export const scenarioRelations = relations(scenario, ({ many }) => ({
+  clients: many(clientScenario),
 }));
 
-export const profiles = pgTable('profiles', {
+export const clientScenario = pgTable('clientscenario', {
   id: serial('id').primaryKey(),
-  bio: varchar('bio', { length: 256 }),
-  userId: integer('user_id')
+  idScenario: integer('scenario_id')
     .notNull()
-    .references(() => user.id),
+    .references(() => scenario.id),
+  idClient: integer('client_id')
+    .notNull()
+    .references(() => clients.id),
+  name: text('name').notNull(),
 });
+
+export const clientScenarioRelations = relations(clientScenario, ({ one }) => ({
+  client: one(clients, {
+    fields: [clientScenario.idClient],
+    references: [clients.id],
+  }),
+
+  scenario: one(scenario, {
+    fields: [clientScenario.idScenario],
+    references: [scenario.id],
+  }),
+}));
